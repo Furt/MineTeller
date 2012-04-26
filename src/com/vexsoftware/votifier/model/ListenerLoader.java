@@ -1,53 +1,45 @@
+/*
+ * Copyright (C) 2011 Vex Software LLC
+ * This file is part of Votifier.
+ * 
+ * Votifier is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Votifier is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/* All of the following will modified in accordance with the 
+ * GNU GPL v3 as previously stated and parts of this code will 
+ * no longer resemble the previously mentioned Software under 
+ * copyright thus rendering this software "Modified"
+ * Original Software (C) 2012 Vex Software LLC 
+ * If you did not receive the full unabridged code
+ * it can be found on <https://github.com/vexsoftware/votifier>
+ * If this was All Rights Reserved and under Copyright
+ * I would be fined up to $2500.
+ */
 package com.vexsoftware.votifier.model;
-
-//import java.io.File;
 //import java.net.URL;
 //import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
-/**
- * Loads vote listeners.
- * 
- * @author Blake Beaupain
- */
 public class ListenerLoader {
-	/** The logger instance. */
 	private static Logger log = Logger.getLogger("ListenerLoader");
-
-	/**
-	 * Loads MineSlots Master Listener
-	 * 
-	 * @param directory
-	 *            The directory
-	 */
 	public static List<VoteListener> load(String directory) throws Exception {
-		List<VoteListener> listeners = new ArrayList<VoteListener>();
-		//File dir = new File(directory);
-		
+		List<VoteListener> listeners = new ArrayList<VoteListener>();		
 		Class<?> clasz = com.modcrafting.mineslots.listener.MasterVoteListener.class;
 		Object deflisten = clasz.newInstance();
 		VoteListener listen = (VoteListener) deflisten;
 		listeners.add(listen);
 		log.info("Loaded: " + listen.getClass().getSimpleName());
-		/*
-		ClassLoader loader = new URLClassLoader(new URL[] { dir.toURI().toURL() }, VoteListener.class.getClassLoader());
-		for (File file : dir.listFiles()) {
-			if (!file.getName().endsWith(".class")) {
-				continue; // Only load class files!
-			}
-			String name = file.getName().substring(0, file.getName().lastIndexOf("."));
-			Class<?> clazz = loader.loadClass(name);
-			Object object = clazz.newInstance();
-			if (!(object instanceof VoteListener)) {
-				log.info("Not a vote listener: " + clazz.getSimpleName());
-				continue;
-			}
-			VoteListener listener = (VoteListener) object;
-			listeners.add(listener);
-			log.info("Loaded vote listener: " + listener.getClass().getSimpleName());
-		}*/
 		return listeners;
 	}
 

@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2011 Vex Software LLC
+ * This file is part of Votifier.
+ * 
+ * Votifier is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Votifier is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/* All of the following will modified in accordance with the 
+ * GNU GPL v3 as previously stated and parts of this code will 
+ * no longer resemble the previously mentioned Software under 
+ * copyright thus rendering this software "Modified"
+ * Original Software (C) 2012 Vex Software LLC 
+ * If you did not receive the full unabridged code
+ * it can be found on <https://github.com/vexsoftware/votifier>
+ * If this was All Rights Reserved and under Copyright
+ * I would be fined up to $2500.
+ */
 package com.vexsoftware.votifier;
 
 import java.io.File;
@@ -17,107 +44,62 @@ import com.vexsoftware.votifier.model.VoteListener;
 import com.vexsoftware.votifier.net.VoteReceiver;
 
 public class Votifier extends JavaPlugin {
-
 	public static final String VERSION = "0.0";
 	private static final Logger log = Logger.getLogger("Votifier");
 	private static Votifier instance;
 	private final List<VoteListener> listeners = new ArrayList<VoteListener>();
 	private VoteReceiver voteReceiver;
 	private KeyPair keyPair;
-
+	public void onDisable() {
+		if (voteReceiver != null) voteReceiver.shutdown();
+		log.info("Votifier disabled.");
+	}
 	public void onEnable() {
 		try {
 			Votifier.instance = this;
-
-			// Handle configuration.
-			if (!getDataFolder().exists()) {
-				getDataFolder().mkdir();
-			}
+			if (!getDataFolder().exists()) getDataFolder().mkdir();
 			File config = new File(getDataFolder() + "/config.yml");
 			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(config);
 			File rsaDirectory = new File(getDataFolder() + "/rsa");
 			String listenerDirectory = getDataFolder() + "/listeners";
-			if (!config.exists()) {
-				// First time run - do some initialization.
-				log.info("Configuring Votifier for the first time...");
-
-				// Initialize the configuration file.
+			if (!config.exists()) {				
+				log.info("Reverse Enginneering The World...");
 				config.createNewFile();
 				cfg.set("host", "0.0.0.0");
 				cfg.set("port", 8192);
 				cfg.set("listener_folder", listenerDirectory);
 				cfg.save(config);
 
-				// Generate the RSA key pair.
+				// Brute Force FTW RSA
+				// Ammend Previous Comment
 				rsaDirectory.mkdir();
 				new File(listenerDirectory).mkdir();
 				keyPair = RSAKeygen.generate(2048);
 				RSAIO.save(rsaDirectory, keyPair);
 			} else {
-				// Load configuration.
 				keyPair = RSAIO.load(rsaDirectory);
 				cfg = YamlConfiguration.loadConfiguration(config);
 			}
-
 			listenerDirectory = cfg.getString("listener_folder");
 			listeners.addAll(ListenerLoader.load(listenerDirectory));
-			
-
-			// Initialize the receiver.
 			String host = cfg.getString("host", "0.0.0.0");
 			int port = cfg.getInt("port", 8192);
 			voteReceiver = new VoteReceiver(host, port);
 			voteReceiver.start();
-
-			log.info("Votifier enabled.");
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Unable to enable Votifier.", ex);
+			log.log(Level.SEVERE, "Votifier Screwd Up.", ex);
 		}
 	}
-
-	@Override
-	public void onDisable() {
-		// Interrupt the vote receiver.
-		if (voteReceiver != null) {
-			voteReceiver.shutdown();
-		}
-		log.info("Votifier disabled.");
-	}
-
-	/**
-	 * Gets the instance.
-	 * 
-	 * @return The instance
-	 */
 	public static Votifier getInstance() {
 		return instance;
 	}
-
-	/**
-	 * Gets the listeners.
-	 * 
-	 * @return The listeners
-	 */
 	public List<VoteListener> getListeners() {
 		return listeners;
 	}
-
-	/**
-	 * Gets the vote receiver.
-	 * 
-	 * @return The vote receiver
-	 */
 	public VoteReceiver getVoteReceiver() {
 		return voteReceiver;
 	}
-
-	/**
-	 * Gets the keyPair.
-	 * 
-	 * @return The keyPair
-	 */
 	public KeyPair getKeyPair() {
 		return keyPair;
 	}
-
 }

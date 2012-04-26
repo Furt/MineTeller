@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Vex Software LLC
+ * Copyright (C) 2011 Vex Software LLC
  * This file is part of Votifier.
  * 
  * Votifier is free software: you can redistribute it and/or modify
@@ -14,6 +14,16 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/* All of the following will modified in accordance with the 
+ * GNU GPL v3 as previously stated and parts of this code will 
+ * no longer resemble the previously mentioned Software under 
+ * copyright thus rendering this software "Modified"
+ * Original Software (C) 2012 Vex Software LLC 
+ * If you did not receive the full unabridged code
+ * it can be found on <https://github.com/vexsoftware/votifier>
+ * If this was All Rights Reserved and under Copyright
+ * I would be fined up to $2500.
  */
 
 package com.vexsoftware.votifier.net;
