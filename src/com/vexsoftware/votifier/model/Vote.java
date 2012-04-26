@@ -125,6 +125,14 @@ public class Vote {
 		return timeStamp;
 	}
 
+	public String getcVar() {
+		return cVar;
+	}
+
+	public String getitemCode() {
+		return itemCode;
+	}
+
 
 	
 

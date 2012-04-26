@@ -102,7 +102,7 @@ public class VoteReceiver extends Thread {
 				InputStream in = socket.getInputStream();
 
 				// Send them our version.
-				writer.write("VOTIFIER " + Votifier.VERSION);
+				writer.write("MINESLOTS " + Votifier.VERSION);
 				writer.newLine();
 				writer.flush();
 
