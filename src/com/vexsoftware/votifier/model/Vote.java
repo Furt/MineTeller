@@ -1,28 +1,7 @@
-/*
- * Copyright (C) 2011 Vex Software LLC
- * This file is part of Votifier.
- * 
- * Votifier is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Votifier is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
- */
+
 
 package com.vexsoftware.votifier.model;
 
-/**
- * A model for a vote.
- * 
- * @author Blake Beaupain
- */
 public class Vote {
 
 	/** The name of the vote service. */
@@ -37,9 +16,15 @@ public class Vote {
 	/** The date and time of the vote. */
 	private String timeStamp;
 
+	/** Adding OpCode Variable for Item Codes */
+	private String itemCode;
+
+	/** Added CVar for any inject */
+	private String cVar;
+
 	@Override
 	public String toString() {
-		return "Vote (from:" + serviceName + " username:" + username + " address:" + address + " timeStamp:" + timeStamp + ")";
+		return "Vote (from:" + serviceName + " username:" + username + " address:" + address + " timeStamp:" + timeStamp + " itemCode:" + itemCode +" cVar:" + cVar +")";
 	}
 
 	/**
@@ -108,7 +93,29 @@ public class Vote {
 	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
+	
+	/**
+	 * Not Writing the JavDoc for this
+	 * 
+	 * @param itemCode
+	 * 				Learn JAVA Crazies
+	 */
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+	
 
+	/**
+	 * GNU Baby Got to love it
+	 * 
+	 * @param cVar
+	 * 				Learn JAVA Crazies
+	 */
+	public void setcVar(String cVar) {
+		this.cVar = cVar;
+		
+	}
+	
 	/**
 	 * Gets the time stamp.
 	 * 
@@ -117,5 +124,8 @@ public class Vote {
 	public String getTimeStamp() {
 		return timeStamp;
 	}
+
+
+	
 
 }

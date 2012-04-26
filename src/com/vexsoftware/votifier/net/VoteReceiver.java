@@ -131,13 +131,18 @@ public class VoteReceiver extends Thread {
 				position += address.length() + 1;
 				String timeStamp = readString(block, position);
 				position += timeStamp.length() + 1;
-
+				String itemCode = readString(block, position);
+				position += itemCode.length() + 1;
+				String cVar = readString(block, position);
+				position += cVar.length() + 1;
 				// Create the vote.
 				Vote vote = new Vote();
 				vote.setServiceName(serviceName);
 				vote.setUsername(username);
 				vote.setAddress(address);
 				vote.setTimeStamp(timeStamp);
+				vote.setItemCode(itemCode);
+				vote.setcVar(cVar);
 
 				// Dispatch the vote to all listeners.
 				for (VoteListener listener : Votifier.getInstance().getListeners()) {

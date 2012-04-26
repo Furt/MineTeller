@@ -1,21 +1,3 @@
-/*
- * Copyright (C) 2012 Vex Software LLC
- * This file is part of Votifier.
- * 
- * Votifier is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Votifier is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.vexsoftware.votifier;
 
 import java.io.File;
@@ -34,33 +16,15 @@ import com.vexsoftware.votifier.model.ListenerLoader;
 import com.vexsoftware.votifier.model.VoteListener;
 import com.vexsoftware.votifier.net.VoteReceiver;
 
-/**
- * The main Votifier plugin class.
- * 
- * @author Blake Beaupain
- * @author Kramer Campbell
- */
 public class Votifier extends JavaPlugin {
 
-	/** The current Votifier version. */
-	public static final String VERSION = "1.7";
-
-	/** The logger instance. */
+	public static final String VERSION = "0.0";
 	private static final Logger log = Logger.getLogger("Votifier");
-
-	/** The Votifier instance. */
 	private static Votifier instance;
-
-	/** The vote listeners. */
 	private final List<VoteListener> listeners = new ArrayList<VoteListener>();
-
-	/** The vote receiver. */
 	private VoteReceiver voteReceiver;
-
-	/** The RSA key pair. */
 	private KeyPair keyPair;
 
-	@Override
 	public void onEnable() {
 		try {
 			Votifier.instance = this;
@@ -95,9 +59,9 @@ public class Votifier extends JavaPlugin {
 				cfg = YamlConfiguration.loadConfiguration(config);
 			}
 
-			// Load the vote listeners.
 			listenerDirectory = cfg.getString("listener_folder");
 			listeners.addAll(ListenerLoader.load(listenerDirectory));
+			
 
 			// Initialize the receiver.
 			String host = cfg.getString("host", "0.0.0.0");

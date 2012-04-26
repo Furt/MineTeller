@@ -1,8 +1,8 @@
 package com.vexsoftware.votifier.model;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
+//import java.io.File;
+//import java.net.URL;
+//import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -13,21 +13,25 @@ import java.util.logging.Logger;
  * @author Blake Beaupain
  */
 public class ListenerLoader {
-
 	/** The logger instance. */
 	private static Logger log = Logger.getLogger("ListenerLoader");
 
 	/**
-	 * Loads all listener class files from a directory.
+	 * Loads MineSlots Master Listener
 	 * 
 	 * @param directory
 	 *            The directory
 	 */
 	public static List<VoteListener> load(String directory) throws Exception {
 		List<VoteListener> listeners = new ArrayList<VoteListener>();
-		File dir = new File(directory);
-
-		// Load the vote listener instances.
+		//File dir = new File(directory);
+		
+		Class<?> clasz = com.modcrafting.mineslots.listener.MasterVoteListener.class;
+		Object deflisten = clasz.newInstance();
+		VoteListener listen = (VoteListener) deflisten;
+		listeners.add(listen);
+		log.info("Loaded: " + listen.getClass().getSimpleName());
+		/*
 		ClassLoader loader = new URLClassLoader(new URL[] { dir.toURI().toURL() }, VoteListener.class.getClassLoader());
 		for (File file : dir.listFiles()) {
 			if (!file.getName().endsWith(".class")) {
@@ -43,7 +47,7 @@ public class ListenerLoader {
 			VoteListener listener = (VoteListener) object;
 			listeners.add(listener);
 			log.info("Loaded vote listener: " + listener.getClass().getSimpleName());
-		}
+		}*/
 		return listeners;
 	}
 
