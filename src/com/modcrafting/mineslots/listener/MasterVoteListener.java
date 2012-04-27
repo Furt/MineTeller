@@ -41,7 +41,7 @@ public class MasterVoteListener implements VoteListener {
 	private static MineSlots v = null;
 	private static Economy econ = null;
 	public MasterVoteListener() {
-		Properties props = new Properties();
+		//Properties props = new Properties();
 		v = MineSlots.getInstance();
 		if (v.getServer().getPluginManager().getPlugin("Vault") != null) {
 			try {
@@ -55,6 +55,8 @@ public class MasterVoteListener implements VoteListener {
 		} else {
 			log.severe("(MineSlots) Could not find Vault! Vote Listener will not work!");
 		}
+		
+	/*	
 		try {
 			// Create the file if it doesn't exist.
 			File configFile = new File("./plugins/Votifier/MineSlots.ini");
@@ -75,12 +77,16 @@ public class MasterVoteListener implements VoteListener {
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "Unable to load MineSlots.ini, using default reward value of: " + amount);
 		}
+	*/
 	}
 	
 	public void voteMade(Vote vote) {
 		log.info("Received: " + vote);
+		
 		String username = vote.getUsername();
+		
 		String cVar = vote.getcVar();
+		
 		if (username == null) return;
 		
 		//Examples

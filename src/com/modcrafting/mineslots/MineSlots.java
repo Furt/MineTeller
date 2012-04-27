@@ -66,7 +66,7 @@ public class MineSlots extends JavaPlugin {
 				log.info("Reverse Enginneering The World...");
 				config.createNewFile();
 				cfg.set("host", "0.0.0.0");
-				cfg.set("port", 8192);
+				cfg.set("port", 8992);
 				cfg.set("listener_folder", listenerDirectory);
 				cfg.save(config);
 
