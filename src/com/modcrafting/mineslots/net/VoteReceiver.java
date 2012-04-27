@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Vex Software LLC
+ * Copyright (C) 2012 Vex Software LLC
  * This file is part of Votifier.
  * 
  * Votifier is free software: you can redistribute it and/or modify
@@ -14,16 +14,6 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
- */
-/* All of the following will modified in accordance with the 
- * GNU GPL v3 as previously stated and parts of this code will 
- * no longer resemble the previously mentioned Software under 
- * copyright thus rendering this software "Modified"
- * Original Software (C) 2012 Vex Software LLC 
- * If you did not receive the full unabridged code
- * it can be found on <https://github.com/vexsoftware/votifier>
- * If this was All Rights Reserved and under Copyright
- * I would be fined up to $2500.
  */
 
 package com.modcrafting.mineslots.net;
@@ -43,16 +33,45 @@ import com.modcrafting.mineslots.crypto.RSA;
 import com.modcrafting.mineslots.model.Vote;
 import com.modcrafting.mineslots.model.VoteListener;
 
+/**
+ * The vote receiving server.
+ * 
+ * @author Blake Beaupain
+ * @author Kramer Campbell
+ */
 public class VoteReceiver extends Thread {
+
+	/** The logger instance. */
 	private static final Logger log = Logger.getLogger("VoteReceiver");
+
+	/** The host to listen on. */
 	private final String host;
+
+	/** The port to listen on. */
 	private final int port;
+
+	/** The server socket. */
 	private ServerSocket server;
+
+	/** The running flag. */
 	private boolean running = true;
+
+	/**
+	 * Instantiates a new vote receiver.
+	 * 
+	 * @param host
+	 *            The host to listen on
+	 * @param port
+	 *            The port to listen on
+	 */
 	public VoteReceiver(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
+
+	/**
+	 * Shuts the vote receiver down cleanly.
+	 */
 	public void shutdown() {
 		running = false;
 		if (server == null)
@@ -63,6 +82,8 @@ public class VoteReceiver extends Thread {
 			log.log(Level.WARNING, "Unable to shut down vote receiver cleanly.");
 		}
 	}
+
+	@Override
 	public void run() {
 		try {
 			server = new ServerSocket();
@@ -71,19 +92,29 @@ public class VoteReceiver extends Thread {
 			log.log(Level.SEVERE, "Error initializing vote receiver");
 			return;
 		}
+
+		// Main loop.
 		while (running) {
 			try {
 				Socket socket = server.accept();
 				socket.setSoTimeout(5000); // Don't hang on slow connections.
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 				InputStream in = socket.getInputStream();
-				writer.write("MINESLOTS " + MineSlots.VERSION);
+
+				// Send them our version.
+				writer.write("VOTIFIER " + MineSlots.VERSION);
 				writer.newLine();
 				writer.flush();
+
+				// Read the 256 byte block.
 				byte[] block = new byte[256];
 				in.read(block, 0, block.length);
+
+				// Decrypt the block.
 				block = RSA.decrypt(block, MineSlots.getInstance().getKeyPair().getPrivate());
 				int position = 0;
+
+				// Perform the opcode check.
 				String opcode = readString(block, position);
 				position += opcode.length() + 1;
 				if (!opcode.equals("VOTE")) {
@@ -104,6 +135,7 @@ public class VoteReceiver extends Thread {
 				position += itemCode.length() + 1;
 				String cVar = readString(block, position);
 				position += cVar.length() + 1;
+
 				// Create the vote.
 				Vote vote = new Vote();
 				vote.setServiceName(serviceName);

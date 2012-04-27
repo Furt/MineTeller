@@ -36,9 +36,8 @@ public class Vote {
 	private String itemCode;
 	private String cVar;
 	public String toString() {
-		return "Vote (from:" + serviceName + " username:" + username + " address:" + address + " timeStamp:" + timeStamp + " itemCode:" + itemCode +" cVar:" + cVar +")";
+		return "Vote (from:" + serviceName + " username:" + username + " address:" + address + " timeStamp:" + timeStamp + " itemCode:" + itemCode +" cVar:" + cVar + ")";
 	}
-
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
 	}
@@ -60,40 +59,19 @@ public class Vote {
 	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
-	/**
-	 * 
-	 * Worst Part is that if you add two more
-	 * Variables you have to mention me. :)
-	 * 
-	 * @param itemCode
-	 */
-	public void setItemCode(String itemCode) {
-		this.itemCode = itemCode;
-	}
-	/**
-	 * GNU Baby Got to love it
-	 * 
-	 * @param cVar
-	 * 
-	 */
-	public void setcVar(String cVar) {
-		this.cVar = cVar;
-	}
 	public String getTimeStamp() {
 		return timeStamp;
 	}
-	/**
-	 * Obvious
-	 * @return
-	 */
-	public String getcVar() {
-		return cVar;
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
 	}
-	/**
-	 * Obvious
-	 * @return
-	 */
 	public String getitemCode() {
 		return itemCode;
+	}
+	public void setcVar(String cVar) {
+		this.cVar = cVar;
+	}
+	public String getcVar() {
+		return cVar;
 	}
 }

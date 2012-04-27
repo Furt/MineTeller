@@ -15,10 +15,6 @@
  */
 package com.modcrafting.mineslots.listener;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +32,7 @@ import com.modcrafting.mineslots.model.Vote;
 import com.modcrafting.mineslots.model.VoteListener;
 
 public class MasterVoteListener implements VoteListener {
-	private Logger log = Logger.getLogger("MasterVoteListener");
+	private Logger log = Logger.getLogger("Minecraft");
 	private double amount = 0;
 	private static MineSlots v = null;
 	private static Economy econ = null;
