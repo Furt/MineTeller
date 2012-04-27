@@ -31,18 +31,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.vexsoftware.votifier.Votifier;
-import com.vexsoftware.votifier.model.Vote;
-import com.vexsoftware.votifier.model.VoteListener;
+import com.modcrafting.mineslots.MineSlots;
+import com.modcrafting.mineslots.model.Vote;
+import com.modcrafting.mineslots.model.VoteListener;
 
 public class MasterVoteListener implements VoteListener {
 	private Logger log = Logger.getLogger("MasterVoteListener");
 	private double amount = 0;
-	private static Votifier v = null;
+	private static MineSlots v = null;
 	private static Economy econ = null;
 	public MasterVoteListener() {
 		Properties props = new Properties();
-		v = Votifier.getInstance();
+		v = MineSlots.getInstance();
 		if (v.getServer().getPluginManager().getPlugin("Vault") != null) {
 			try {
 			RegisteredServiceProvider<Economy> economyProvider = v.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);

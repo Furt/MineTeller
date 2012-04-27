@@ -26,7 +26,7 @@
  * I would be fined up to $2500.
  */
 
-package com.vexsoftware.votifier.net;
+package com.modcrafting.mineslots.net;
 
 import java.io.BufferedWriter;
 import java.io.InputStream;
@@ -38,50 +38,21 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.vexsoftware.votifier.Votifier;
-import com.vexsoftware.votifier.crypto.RSA;
-import com.vexsoftware.votifier.model.Vote;
-import com.vexsoftware.votifier.model.VoteListener;
+import com.modcrafting.mineslots.MineSlots;
+import com.modcrafting.mineslots.crypto.RSA;
+import com.modcrafting.mineslots.model.Vote;
+import com.modcrafting.mineslots.model.VoteListener;
 
-/**
- * The vote receiving server.
- * 
- * @author Blake Beaupain
- * @author Kramer Campbell
- */
 public class VoteReceiver extends Thread {
-
-	/** The logger instance. */
 	private static final Logger log = Logger.getLogger("VoteReceiver");
-
-	/** The host to listen on. */
 	private final String host;
-
-	/** The port to listen on. */
 	private final int port;
-
-	/** The server socket. */
 	private ServerSocket server;
-
-	/** The running flag. */
 	private boolean running = true;
-
-	/**
-	 * Instantiates a new vote receiver.
-	 * 
-	 * @param host
-	 *            The host to listen on
-	 * @param port
-	 *            The port to listen on
-	 */
 	public VoteReceiver(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
-
-	/**
-	 * Shuts the vote receiver down cleanly.
-	 */
 	public void shutdown() {
 		running = false;
 		if (server == null)
@@ -92,8 +63,6 @@ public class VoteReceiver extends Thread {
 			log.log(Level.WARNING, "Unable to shut down vote receiver cleanly.");
 		}
 	}
-
-	@Override
 	public void run() {
 		try {
 			server = new ServerSocket();
@@ -102,29 +71,19 @@ public class VoteReceiver extends Thread {
 			log.log(Level.SEVERE, "Error initializing vote receiver");
 			return;
 		}
-
-		// Main loop.
 		while (running) {
 			try {
 				Socket socket = server.accept();
 				socket.setSoTimeout(5000); // Don't hang on slow connections.
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 				InputStream in = socket.getInputStream();
-
-				// Send them our version.
-				writer.write("MINESLOTS " + Votifier.VERSION);
+				writer.write("MINESLOTS " + MineSlots.VERSION);
 				writer.newLine();
 				writer.flush();
-
-				// Read the 256 byte block.
 				byte[] block = new byte[256];
 				in.read(block, 0, block.length);
-
-				// Decrypt the block.
-				block = RSA.decrypt(block, Votifier.getInstance().getKeyPair().getPrivate());
+				block = RSA.decrypt(block, MineSlots.getInstance().getKeyPair().getPrivate());
 				int position = 0;
-
-				// Perform the opcode check.
 				String opcode = readString(block, position);
 				position += opcode.length() + 1;
 				if (!opcode.equals("VOTE")) {
@@ -155,7 +114,7 @@ public class VoteReceiver extends Thread {
 				vote.setcVar(cVar);
 
 				// Dispatch the vote to all listeners.
-				for (VoteListener listener : Votifier.getInstance().getListeners()) {
+				for (VoteListener listener : MineSlots.getInstance().getListeners()) {
 					try {
 						listener.voteMade(vote);
 					} catch (Exception ex) {

@@ -25,7 +25,7 @@
  * If this was All Rights Reserved and under Copyright
  * I would be fined up to $2500.
  */
-package com.vexsoftware.votifier.model;
+package com.modcrafting.mineslots.model;
 //import java.net.URL;
 //import java.net.URLClassLoader;
 import java.util.ArrayList;

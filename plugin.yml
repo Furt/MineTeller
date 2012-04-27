@@ -1,5 +1,5 @@
 name: Mineslots
-main: com.vexsoftware.votifier.Votifier
+main: com.modcrafting.mineslots.MineSlots
 version: 0.0
 description: A plugin that gets notified when votes are made for the server on toplists.
-authors: [Built From Votifier -Deathmarine]
+authors: [Based on Votifier -Deathmarine]

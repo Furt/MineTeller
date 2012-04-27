@@ -26,7 +26,7 @@
  * I would be fined up to $2500.
  */
 
-package com.vexsoftware.votifier.model;
+package com.modcrafting.mineslots.model;
 
 public class Vote {
 	private String serviceName;
