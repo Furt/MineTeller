@@ -1,5 +1,5 @@
 name: Mineslots
 main: com.modcrafting.mineslots.MineSlots
 version: 0.0
-description: A plugin that gets notified when votes are made for the server on toplists.
+description: A plugin that gets notified when votes are made from MinecraftCasino.
 authors: [Built From Votifier -Deathmarine]

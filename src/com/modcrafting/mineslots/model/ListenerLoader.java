@@ -15,19 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* All of the following will modified in accordance with the 
- * GNU GPL v3 as previously stated and parts of this code will 
- * no longer resemble the previously mentioned Software under 
- * copyright thus rendering this software "Modified"
- * Original Software (C) 2012 Vex Software LLC 
- * If you did not receive the full unabridged code
- * it can be found on <https://github.com/vexsoftware/votifier>
- * If this was All Rights Reserved and under Copyright
- * I would be fined up to $2500.
+/*
+ * 
+ * Modified By Deathmarine
+ * 
  */
 package com.modcrafting.mineslots.model;
-//import java.net.URL;
-//import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -39,7 +32,7 @@ public class ListenerLoader {
 		Object deflisten = clasz.newInstance();
 		VoteListener listen = (VoteListener) deflisten;
 		listeners.add(listen);
-		log.info("Loaded: " + listen.getClass().getSimpleName());
+		log.info("[MineSlots] Loaded Master Listener");
 		return listeners;
 	}
 

@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+/*
+ * Modified By Deathmarine
+ * 
+ */
 package com.modcrafting.mineslots;
 
 import java.io.File;
@@ -26,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.modcrafting.mineslots.crypto.RSAIO;
@@ -62,6 +66,7 @@ public class MineSlots extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		PluginDescriptionFile pdfFile = this.getDescription();
 		try {
 			MineSlots.instance = this;
 
@@ -75,7 +80,7 @@ public class MineSlots extends JavaPlugin {
 			String listenerDirectory = getDataFolder() + "/listeners";
 			if (!config.exists()) {
 				// First time run - do some initialization.
-				log.info("Configuring Votifier for the first time...");
+				log.info("[" + pdfFile.getName() + "] Contemplating the universe...");
 
 				// Initialize the configuration file.
 				config.createNewFile();
@@ -105,9 +110,9 @@ public class MineSlots extends JavaPlugin {
 			voteReceiver = new VoteReceiver(host, port);
 			voteReceiver.start();
 
-			log.info("Votifier enabled.");
+			log.info("[" + pdfFile.getName() + "] " + pdfFile.getVersion() + " enabled.");
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Unable to enable Votifier.", ex);
+			log.log(Level.SEVERE, "Unable to enable [" + pdfFile.getName() + "]", ex);
 		}
 	}
 
@@ -116,8 +121,8 @@ public class MineSlots extends JavaPlugin {
 		// Interrupt the vote receiver.
 		if (voteReceiver != null) {
 			voteReceiver.shutdown();
-		}
-		log.info("Votifier disabled.");
+		}		
+		log.info("[Mineslots] disabled.");
 	}
 
 	/**

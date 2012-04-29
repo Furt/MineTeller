@@ -1,16 +1,5 @@
 /* Non-Copyright 2012 Deathmarine Under
- * The Federation of Lost Lawn Chairs License 
- * Hereby make it know that the law is my bitch
- * and I need to protect open source software from 
- * thieves trying to sell it when that damn money
- * could have been mine. Blah. Blah. Blah.
- * 
- * Congrats I added on to you plugin.
- * Use the extra additions to the you plugin
- * as a compliment.
- * 
- * It really is a nice plugin just not what I needed
- * when I'm help out a friend.
+ * The Federation of Lost Lawn Chairs License
  * 
  */
 package com.modcrafting.mineslots.listener;
@@ -51,29 +40,6 @@ public class MasterVoteListener implements VoteListener {
 		} else {
 			log.severe("(MineSlots) Could not find Vault! Vote Listener will not work!");
 		}
-		
-	/*	
-		try {
-			// Create the file if it doesn't exist.
-			File configFile = new File("./plugins/Votifier/MineSlots.ini");
-			if (!configFile.exists()) {
-				configFile.createNewFile();
-
-				// Load the configuration.
-				props.load(new FileReader(configFile));
-
-				// Write the default configuration.
-				props.setProperty("reward_amount", Double.toString(amount));
-				props.store(new FileWriter(configFile), "iConomy Listener Configuration");
-			} else {
-				// Load the configuration.
-				props.load(new FileReader(configFile));
-			}
-
-		} catch (Exception ex) {
-			log.log(Level.WARNING, "Unable to load MineSlots.ini, using default reward value of: " + amount);
-		}
-	*/
 	}
 	
 	public void voteMade(Vote vote) {
@@ -85,17 +51,21 @@ public class MasterVoteListener implements VoteListener {
 		
 		if (username == null) return;
 		
-		//Examples
+		//Examples of cVars to use on the site Timed Flying (itemCode=Amount of time)
+		//Kind of incompatible with NoCheat
 		if (cVar.equalsIgnoreCase("fly") && Bukkit.getServer().getPlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
 			name.setFlying(true);
-			/*Hashmap.put(name.getName(),"fly");
-			 *(new Thread(FlyTimer).start())
+			name.sendMessage(ChatColor.GREEN + "You can now fly.");
+			/*Hashmap.put(name.getName(),Integer.parse(vote.getitemCode()));
+			 *(new Thread(FlyTimer)).start();
 			 * This will enable the player Flying if vote cVar is "fly"
 			 */
 			return;
 		}
-		if (cVar.equalsIgnoreCase("money")){
+		
+		//This will deposit an amount from the itemCode
+		if (cVar.equalsIgnoreCase("deposit")){
 			amount = Double.parseDouble(vote.getitemCode());
 			if(econ.hasAccount(username)){
 				EconomyResponse r = econ.depositPlayer(username, amount);
@@ -114,26 +84,44 @@ public class MasterVoteListener implements VoteListener {
 			}
 			return;
 		}
+		//This will take money form the users account and ping back if they no longer have funds
 		if (cVar.equalsIgnoreCase("pay")){
 			amount = Double.parseDouble(vote.getitemCode());
 			if(econ.hasAccount(username)){
-				EconomyResponse r = econ.withdrawPlayer(username, amount);
-				if (r.transactionSuccess()) {
-					log.log(Level.INFO, "(MineSlots) Successfully withdrew " + username); 
+				if(econ.getBalance(username) < amount){
+					if(Bukkit.getServer().getPlayer(username).isOnline()){
+						Bukkit.getServer().getPlayer(username).sendMessage(
+								ChatColor.GREEN + "[" + 
+								ChatColor.GOLD + "Money" + 
+								ChatColor.GREEN + "] Attempt to withdraw " + 
+								Double.toString(amount) + "from " + username + " failed!");
+					}
+					/*
+					 *(new Thread(PingBack)).start();
+					 * send ping back notification
+					 */
+					return;
 				}else{
-					log.log(Level.WARNING, "(MineSlots) Error" + r.errorMessage); 
+					EconomyResponse r = econ.withdrawPlayer(username, amount);
+					if (r.transactionSuccess()) {
+						log.log(Level.INFO, "(MineSlots) Successfully withdrew " + username); 
+					}else{
+						log.log(Level.WARNING, "(MineSlots) Error" + r.errorMessage); 
+					}
+					if(Bukkit.getServer().getPlayer(username).isOnline()){
+						Bukkit.getServer().getPlayer(username).sendMessage(
+							ChatColor.GREEN + "[" + 
+							ChatColor.GOLD + "Money" + 
+							ChatColor.GREEN + "] Withdrawn " + 
+							Double.toString(amount) + " from " + username + "'s account.");
+					}
 				}
-				if(Bukkit.getServer().getPlayer(username).isOnline()){
-					Bukkit.getServer().getPlayer(username).sendMessage(
-						ChatColor.GREEN + "[" + 
-						ChatColor.GOLD + "Money" + 
-						ChatColor.GREEN + "] Withdrawn " + 
-						Double.toString(amount) + " from " + username + "'s account.");
-				}
+				
 			}
 			return;
 		}
 		
+		//This will kill the player on receipt if cVar="die"
 		if (cVar.equalsIgnoreCase("die") && Bukkit.getServer().getPlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
 			name.setHealth(0);
@@ -141,17 +129,14 @@ public class MasterVoteListener implements VoteListener {
 					ChatColor.RED + "Betterluck Next Time!");
 		}
 		
-		if (cVar.equalsIgnoreCase("ban")){
-			Player name = Bukkit.getServer().getPlayer(username);
-			if(name.isOnline()){
-				name.kickPlayer(
-						ChatColor.BLACK + "You just got F'd in the A!!");
-			}
-			name.setBanned(true);
-		}
-		
+		/*
+		 * This will give a player an item/itemstack dependant on itemCode and cVar
+		 * Example itemCode="278" cVar="1" will give one diamond pickaxe
+		 * or itemCode="46" cVar="64" will give a full stack of tnt
+		 */
 		if (Integer.parseInt(vote.getitemCode()) > 0){
 			Player name = Bukkit.getServer().getPlayer(username);
+			//Local Storage is available to store player winnings
 			if(name.isOnline()){
 				ItemStack item = new ItemStack(
 						Integer.parseInt(vote.getitemCode()), 

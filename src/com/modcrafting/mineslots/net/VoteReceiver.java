@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
  */
+/*
+ * 
+ * Modified by Deathmarine
+ * 
+ */
 
 package com.modcrafting.mineslots.net;
 
