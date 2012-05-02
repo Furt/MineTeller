@@ -46,7 +46,9 @@ import com.modcrafting.mineteller.net.VoteReceiver;
  */
 public class MineTeller extends JavaPlugin {
 
-	/** The current Votifier version. */
+	//Create a setter to pull from 
+	//PluginDescriptionFile pdfFile = this.getDescription();
+	
 	public static final String VERSION = "0.1";
 
 	/** The logger instance. */
@@ -109,6 +111,10 @@ public class MineTeller extends JavaPlugin {
 			int port = cfg.getInt("port", 8992);
 			voteReceiver = new VoteReceiver(host, port);
 			voteReceiver.start();
+			/* Configure for
+			 * getServer().getScheduler().scheduleAsyncRepeatingTask(this, voteReceiver, 20L, 20L);
+			 * Let bukkit recirculate the Thread
+			 */
 
 			log.info("[" + pdfFile.getName() + "] " + pdfFile.getVersion() + " enabled.");
 		} catch (Exception ex) {
