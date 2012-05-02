@@ -16,7 +16,7 @@
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.modcrafting.mineslots.model;
+package com.modcrafting.mineteller.model;
 
 /**
  * A listener for votes.

@@ -19,7 +19,7 @@
  * Modified By Deathmarine
  * 
  */
-package com.modcrafting.mineslots;
+package com.modcrafting.mineteller;
 
 import java.io.File;
 import java.security.KeyPair;
@@ -32,11 +32,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.modcrafting.mineslots.crypto.RSAIO;
-import com.modcrafting.mineslots.crypto.RSAKeygen;
-import com.modcrafting.mineslots.model.ListenerLoader;
-import com.modcrafting.mineslots.model.VoteListener;
-import com.modcrafting.mineslots.net.VoteReceiver;
+import com.modcrafting.mineteller.crypto.RSAIO;
+import com.modcrafting.mineteller.crypto.RSAKeygen;
+import com.modcrafting.mineteller.model.ListenerLoader;
+import com.modcrafting.mineteller.model.VoteListener;
+import com.modcrafting.mineteller.net.VoteReceiver;
 
 /**
  * The main Votifier plugin class.
@@ -44,7 +44,7 @@ import com.modcrafting.mineslots.net.VoteReceiver;
  * @author Blake Beaupain
  * @author Kramer Campbell
  */
-public class MineSlots extends JavaPlugin {
+public class MineTeller extends JavaPlugin {
 
 	/** The current Votifier version. */
 	public static final String VERSION = "0.1";
@@ -53,7 +53,7 @@ public class MineSlots extends JavaPlugin {
 	private static final Logger log = Logger.getLogger("Votifier");
 
 	/** The Votifier instance. */
-	private static MineSlots instance;
+	private static MineTeller instance;
 
 	/** The vote listeners. */
 	private final List<VoteListener> listeners = new ArrayList<VoteListener>();
@@ -68,7 +68,7 @@ public class MineSlots extends JavaPlugin {
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
 		try {
-			MineSlots.instance = this;
+			MineTeller.instance = this;
 
 			// Handle configuration.
 			if (!getDataFolder().exists()) {
@@ -122,7 +122,7 @@ public class MineSlots extends JavaPlugin {
 		if (voteReceiver != null) {
 			voteReceiver.shutdown();
 		}		
-		log.info("[Mineslots] disabled.");
+		log.info("[MineTeller] disabled.");
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class MineSlots extends JavaPlugin {
 	 * 
 	 * @return The instance
 	 */
-	public static MineSlots getInstance() {
+	public static MineTeller getInstance() {
 		return instance;
 	}
 

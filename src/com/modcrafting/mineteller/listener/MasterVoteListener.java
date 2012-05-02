@@ -2,7 +2,7 @@
  * The Federation of Lost Lawn Chairs License
  * 
  */
-package com.modcrafting.mineslots.listener;
+package com.modcrafting.mineteller.listener;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,29 +16,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.modcrafting.mineslots.MineSlots;
-import com.modcrafting.mineslots.model.Vote;
-import com.modcrafting.mineslots.model.VoteListener;
+import com.modcrafting.mineteller.MineTeller;
+import com.modcrafting.mineteller.model.Vote;
+import com.modcrafting.mineteller.model.VoteListener;
 
 public class MasterVoteListener implements VoteListener {
 	private Logger log = Logger.getLogger("Minecraft");
 	private double amount = 0;
-	private static MineSlots v = null;
+	private static MineTeller v = null;
 	private static Economy econ = null;
 	public MasterVoteListener() {
 		//Properties props = new Properties();
-		v = MineSlots.getInstance();
+		v = MineTeller.getInstance();
 		if (v.getServer().getPluginManager().getPlugin("Vault") != null) {
 			try {
 			RegisteredServiceProvider<Economy> economyProvider = v.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 			econ = economyProvider.getProvider();
 			}
 			catch(Exception e) {
-				log.severe("(MineSlots) Error hooking to Vault! MineSlots Listener will not work!");
-				log.severe("(MineSlots) Error is: "+e.getMessage()+" from "+e.getCause()+".");
+				log.severe("(MineTeller) Error hooking to Vault! MineTeller Listener will not work!");
+				log.severe("(MineTeller) Error is: "+e.getMessage()+" from "+e.getCause()+".");
 			}
 		} else {
-			log.severe("(MineSlots) Could not find Vault! Vote Listener will not work!");
+			log.severe("(MineTeller) Could not find Vault! Vote Listener will not work!");
 		}
 	}
 	
@@ -70,10 +70,11 @@ public class MasterVoteListener implements VoteListener {
 			if(econ.hasAccount(username)){
 				EconomyResponse r = econ.depositPlayer(username, amount);
 				if (r.transactionSuccess()) {
-					log.log(Level.INFO, "(MineSlots) Successfully credited " + username); 
+					log.log(Level.INFO, "(MineTeller) Successfully credited " + username); 
 				}else{
-					log.log(Level.WARNING, "(MineSlots) Error" + r.errorMessage); 
+					log.log(Level.WARNING, "(MineTeller) Error" + r.errorMessage); 
 				}
+				//Sent to Specific Player Displayed as [Money] Deposited {Qty} in {Player}'s account				
 				if(Bukkit.getServer().getPlayer(username).isOnline()){
 					Bukkit.getServer().getPlayer(username).sendMessage(
 						ChatColor.GREEN + "[" + 
@@ -90,6 +91,7 @@ public class MasterVoteListener implements VoteListener {
 			if(econ.hasAccount(username)){
 				if(econ.getBalance(username) < amount){
 					if(Bukkit.getServer().getPlayer(username).isOnline()){
+						//Sent to Specific Player Displayed as [Money] Attempt to withdraw {Qty} from {Player} failed	
 						Bukkit.getServer().getPlayer(username).sendMessage(
 								ChatColor.GREEN + "[" + 
 								ChatColor.GOLD + "Money" + 
@@ -104,10 +106,11 @@ public class MasterVoteListener implements VoteListener {
 				}else{
 					EconomyResponse r = econ.withdrawPlayer(username, amount);
 					if (r.transactionSuccess()) {
-						log.log(Level.INFO, "(MineSlots) Successfully withdrew " + username); 
+						log.log(Level.INFO, "(MineTeller) Successfully withdrew " + username); 
 					}else{
-						log.log(Level.WARNING, "(MineSlots) Error" + r.errorMessage); 
+						log.log(Level.WARNING, "(MineTeller) Error" + r.errorMessage); 
 					}
+					//Sent to Specific Player Displayed as [Money] Withdrawn {Qty} from {Player}'s account
 					if(Bukkit.getServer().getPlayer(username).isOnline()){
 						Bukkit.getServer().getPlayer(username).sendMessage(
 							ChatColor.GREEN + "[" + 
@@ -119,6 +122,27 @@ public class MasterVoteListener implements VoteListener {
 				
 			}
 			return;
+		}
+		//This will give cVar="xp" based on the value given for itemCode added to the original players amount
+		if (cVar.equalsIgnoreCase("xp") && Bukkit.getServer().getPlayer(username).isOnline()){
+			Player name = Bukkit.getServer().getPlayer(username);
+			name.setExp(name.getExp() + Float.parseFloat(vote.getitemCode()));
+			name.sendMessage(ChatColor.DARK_PURPLE + "You've Received " + vote.getitemCode() + " Xp");
+		}
+		//This will remove cVar="xp" based on the value given for itemCode added to the original players amount
+		if (cVar.equalsIgnoreCase("losexp") && Bukkit.getServer().getPlayer(username).isOnline()){
+			Player name = Bukkit.getServer().getPlayer(username);
+			if(name.getExp() > Float.parseFloat(vote.getitemCode())){
+				name.setExp(name.getExp() - Float.parseFloat(vote.getitemCode()));
+				name.sendMessage(ChatColor.RED + "You've lost " + vote.getitemCode() + " Xp");
+			}
+			/*
+			 * Similar to the ping back system for Money xp will not remove 
+			 * if under the player amount unless you just want to punish them with death
+			 * Or establish a ping for this as well
+			 * name.setHealth(0);
+			 */
+			
 		}
 		
 		//This will kill the player on receipt if cVar="die"
@@ -133,6 +157,7 @@ public class MasterVoteListener implements VoteListener {
 		 * This will give a player an item/itemstack dependant on itemCode and cVar
 		 * Example itemCode="278" cVar="1" will give one diamond pickaxe
 		 * or itemCode="46" cVar="64" will give a full stack of tnt
+		 * Displays You Recieved {QTY} {ITEMNAME}!
 		 */
 		if (Integer.parseInt(vote.getitemCode()) > 0){
 			Player name = Bukkit.getServer().getPlayer(username);
@@ -144,6 +169,7 @@ public class MasterVoteListener implements VoteListener {
 				name.getInventory().addItem(item);
 				name.sendMessage(
 						ChatColor.AQUA + "You Received " +
+						ChatColor.DARK_AQUA + vote.getcVar() + " " +  
 						ChatColor.DARK_AQUA + item.getType().name() +
 						"!");
 			}

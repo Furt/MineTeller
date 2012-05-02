@@ -20,7 +20,7 @@
  * Modified By Deathmarine
  * 
  */
-package com.modcrafting.mineslots.model;
+package com.modcrafting.mineteller.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,11 +28,11 @@ public class ListenerLoader {
 	private static Logger log = Logger.getLogger("ListenerLoader");
 	public static List<VoteListener> load(String directory) throws Exception {
 		List<VoteListener> listeners = new ArrayList<VoteListener>();		
-		Class<?> clasz = com.modcrafting.mineslots.listener.MasterVoteListener.class;
+		Class<?> clasz = com.modcrafting.mineteller.listener.MasterVoteListener.class;
 		Object deflisten = clasz.newInstance();
 		VoteListener listen = (VoteListener) deflisten;
 		listeners.add(listen);
-		log.info("[MineSlots] Loaded Master Listener");
+		log.info("[MineTeller] Loaded Master Listener");
 		return listeners;
 	}
 

@@ -21,7 +21,7 @@
  * 
  */
 
-package com.modcrafting.mineslots.net;
+package com.modcrafting.mineteller.net;
 
 import java.io.BufferedWriter;
 import java.io.InputStream;
@@ -33,10 +33,10 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.modcrafting.mineslots.MineSlots;
-import com.modcrafting.mineslots.crypto.RSA;
-import com.modcrafting.mineslots.model.Vote;
-import com.modcrafting.mineslots.model.VoteListener;
+import com.modcrafting.mineteller.MineTeller;
+import com.modcrafting.mineteller.crypto.RSA;
+import com.modcrafting.mineteller.model.Vote;
+import com.modcrafting.mineteller.model.VoteListener;
 
 /**
  * The vote receiving server.
@@ -107,7 +107,7 @@ public class VoteReceiver extends Thread {
 				InputStream in = socket.getInputStream();
 
 				// Send them our version.
-				writer.write("VOTIFIER " + MineSlots.VERSION);
+				writer.write("VOTIFIER " + MineTeller.VERSION);
 				writer.newLine();
 				writer.flush();
 
@@ -116,7 +116,7 @@ public class VoteReceiver extends Thread {
 				in.read(block, 0, block.length);
 
 				// Decrypt the block.
-				block = RSA.decrypt(block, MineSlots.getInstance().getKeyPair().getPrivate());
+				block = RSA.decrypt(block, MineTeller.getInstance().getKeyPair().getPrivate());
 				int position = 0;
 
 				// Perform the opcode check.
@@ -151,7 +151,7 @@ public class VoteReceiver extends Thread {
 				vote.setcVar(cVar);
 
 				// Dispatch the vote to all listeners.
-				for (VoteListener listener : MineSlots.getInstance().getListeners()) {
+				for (VoteListener listener : MineTeller.getInstance().getListeners()) {
 					try {
 						listener.voteMade(vote);
 					} catch (Exception ex) {

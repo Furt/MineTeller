@@ -21,7 +21,7 @@
  * 
  */
 
-package com.modcrafting.mineslots.model;
+package com.modcrafting.mineteller.model;
 
 public class Vote {
 	private String serviceName;

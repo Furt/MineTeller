@@ -16,7 +16,7 @@
  * along with Votifier.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.modcrafting.mineslots.crypto;
+package com.modcrafting.mineteller.crypto;
 
 import java.io.File;
 import java.io.FileInputStream;
