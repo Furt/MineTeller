@@ -53,10 +53,14 @@ public class MasterVoteListener implements VoteListener {
 		
 		//Examples of cVars to use on the site Timed Flying (itemCode=Amount of time)
 		//Kind of incompatible with NoCheat
-		if (cVar.equalsIgnoreCase("fly") && Bukkit.getServer().getPlayer(username).isOnline()){
+		if (cVar.equalsIgnoreCase("fly") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
 			name.setFlying(true);
-			name.sendMessage(ChatColor.GREEN + "You can now fly.");
+			name.sendMessage(
+					ChatColor.GREEN + "[" + 
+					ChatColor.GOLD + vote.getServiceName() + 
+					ChatColor.GREEN + "] " +
+					ChatColor.YELLOW + "You can now fly.");
 			/*Hashmap.put(name.getName(),Integer.parse(vote.getitemCode()));
 			 *(new Thread(FlyTimer)).start();
 			 * This will enable the player Flying if vote cVar is "fly"
@@ -75,33 +79,30 @@ public class MasterVoteListener implements VoteListener {
 					log.log(Level.WARNING, "(MineTeller) Error" + r.errorMessage); 
 				}
 				//Sent to Specific Player Displayed as [Money] Deposited {Qty} in {Player}'s account				
-				if(Bukkit.getServer().getPlayer(username).isOnline()){
+				if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 					Bukkit.getServer().getPlayer(username).sendMessage(
 						ChatColor.GREEN + "[" + 
-						ChatColor.GOLD + "Money" + 
-						ChatColor.GREEN + "] Deposited " + 
+						ChatColor.GOLD + vote.getServiceName() + 
+						ChatColor.GREEN + "] " +
+						ChatColor.GREEN + "Deposited " + 
 						Double.toString(amount) + " in " + username + "'s account.");
 				}
 			}
 			return;
 		}
-		//This will take money form the users account and ping back if they no longer have funds
 		if (cVar.equalsIgnoreCase("pay")){
 			amount = Double.parseDouble(vote.getitemCode());
 			if(econ.hasAccount(username)){
 				if(econ.getBalance(username) < amount){
-					if(Bukkit.getServer().getPlayer(username).isOnline()){
+					if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 						//Sent to Specific Player Displayed as [Money] Attempt to withdraw {Qty} from {Player} failed	
 						Bukkit.getServer().getPlayer(username).sendMessage(
 								ChatColor.GREEN + "[" + 
-								ChatColor.GOLD + "Money" + 
-								ChatColor.GREEN + "] Attempt to withdraw " + 
+								ChatColor.GOLD + vote.getServiceName() + 
+								ChatColor.GREEN + "] " +
+								ChatColor.GREEN + "Attempt to withdraw " + 
 								Double.toString(amount) + "from " + username + " failed!");
 					}
-					/*
-					 *(new Thread(PingBack)).start();
-					 * send ping back notification
-					 */
 					return;
 				}else{
 					EconomyResponse r = econ.withdrawPlayer(username, amount);
@@ -111,11 +112,12 @@ public class MasterVoteListener implements VoteListener {
 						log.log(Level.WARNING, "(MineTeller) Error" + r.errorMessage); 
 					}
 					//Sent to Specific Player Displayed as [Money] Withdrawn {Qty} from {Player}'s account
-					if(Bukkit.getServer().getPlayer(username).isOnline()){
+					if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 						Bukkit.getServer().getPlayer(username).sendMessage(
 							ChatColor.GREEN + "[" + 
-							ChatColor.GOLD + "Money" + 
-							ChatColor.GREEN + "] Withdrawn " + 
+							ChatColor.GOLD + vote.getServiceName() + 
+							ChatColor.GREEN + "] " +
+							ChatColor.GREEN + "Withdrawn " + 
 							Double.toString(amount) + " from " + username + "'s account.");
 					}
 				}
@@ -123,19 +125,35 @@ public class MasterVoteListener implements VoteListener {
 			}
 			return;
 		}
+		
 		//This will give cVar="xp" based on the value given for itemCode added to the original players amount
-		if (cVar.equalsIgnoreCase("xp") && Bukkit.getServer().getPlayer(username).isOnline()){
+		if (cVar.equalsIgnoreCase("xp")){
+			if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
-			name.setExp(name.getExp() + Float.parseFloat(vote.getitemCode()));
-			name.sendMessage(ChatColor.DARK_PURPLE + "You've Received " + vote.getitemCode() + " Xp");
+			name.giveExp(Integer.parseInt(vote.getitemCode()));
+			name.sendMessage(
+					ChatColor.GREEN + "[" + 
+					ChatColor.GOLD + vote.getServiceName() + 
+					ChatColor.GREEN + "] " +
+					ChatColor.DARK_PURPLE + "You've Received " + vote.getitemCode() + " Xp");
+			return;
+			}else{
+				return;
+			}
 		}
+		
 		//This will remove cVar="xp" based on the value given for itemCode added to the original players amount
-		if (cVar.equalsIgnoreCase("losexp") && Bukkit.getServer().getPlayer(username).isOnline()){
+		if (cVar.equalsIgnoreCase("losexp") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
 			if(name.getExp() > Float.parseFloat(vote.getitemCode())){
 				name.setExp(name.getExp() - Float.parseFloat(vote.getitemCode()));
-				name.sendMessage(ChatColor.RED + "You've lost " + vote.getitemCode() + " Xp");
+				name.sendMessage(
+						ChatColor.GREEN + "[" + 
+						ChatColor.GOLD + vote.getServiceName() + 
+						ChatColor.GREEN + "] " +
+						ChatColor.RED + "You've lost " + vote.getitemCode() + " Xp");
 			}
+			return;
 			/*
 			 * Similar to the ping back system for Money xp will not remove 
 			 * if under the player amount unless you just want to punish them with death
@@ -144,13 +162,58 @@ public class MasterVoteListener implements VoteListener {
 			 */
 			
 		}
-		
+		/*
+		 * Example String.
+		 * $V->Vote("deathmarine", "127.0.0.1", 8992, "100", "code:AAAA-BBBB-1111-2222-xxxx", "RSAPublicKey");
+		 * cVar "code:" add the code to that string.
+		 * itemCode use for the amount to withdraw and test.
+		 * 
+		 */
+		if (cVar.contains("code:")){
+			String code = cVar.replace("code:", "");
+			amount = Double.parseDouble(vote.getitemCode());
+			if(econ.hasAccount(username)){
+				if(econ.getBalance(username) < amount){
+					if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
+						//Sent to Specific Player Displayed as [] Attempt to withdraw {Qty} from {Player} failed	
+						Bukkit.getServer().getPlayer(username).sendMessage(
+								ChatColor.GREEN + "[" + 
+								ChatColor.GOLD + vote.getServiceName() + 
+								ChatColor.GREEN + "] " +
+								ChatColor.GREEN + "Attempt to withdraw " + 
+								Double.toString(amount) + " from " + username + " failed!");
+					}
+					return;
+				}else{
+					EconomyResponse r = econ.withdrawPlayer(username, amount);
+					if (r.transactionSuccess()) {
+						log.log(Level.INFO, "(MineTeller) Successfully withdrew " + username); 
+					}else{
+						log.log(Level.WARNING, "(MineTeller) Error" + r.errorMessage); 
+					}
+					if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
+						Bukkit.getServer().getPlayer(username).sendMessage(
+							ChatColor.GREEN + "[" + 
+							ChatColor.GOLD + vote.getServiceName() + 
+							ChatColor.GREEN + "] " +
+							ChatColor.GREEN + "Use Code: " + code + " to recieve your " +
+							ChatColor.GOLD + Double.toString(amount) + 
+							ChatColor.GREEN + " Tokens!");
+					}
+					return;
+				}
+			}
+		}
 		//This will kill the player on receipt if cVar="die"
-		if (cVar.equalsIgnoreCase("die") && Bukkit.getServer().getPlayer(username).isOnline()){
+		if (cVar.equalsIgnoreCase("die") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
 			Player name = Bukkit.getServer().getPlayer(username);
 			name.setHealth(0);
 			name.sendMessage(
+					ChatColor.GREEN + "[" + 
+					ChatColor.GOLD + vote.getServiceName() + 
+					ChatColor.GREEN + "] " +
 					ChatColor.RED + "Betterluck Next Time!");
+			return;
 		}
 		
 		/*
@@ -161,19 +224,23 @@ public class MasterVoteListener implements VoteListener {
 		 */
 		if (Integer.parseInt(vote.getitemCode()) > 0){
 			Player name = Bukkit.getServer().getPlayer(username);
-			//Local Storage is available to store player winnings
-			if(name.isOnline()){
+			if(name != null && name.isOnline()){
 				ItemStack item = new ItemStack(
 						Integer.parseInt(vote.getitemCode()), 
 						Integer.parseInt(vote.getcVar()));
 				name.getInventory().addItem(item);
 				name.sendMessage(
+						ChatColor.GREEN + "[" + 
+						ChatColor.GOLD + vote.getServiceName() + 
+						ChatColor.GREEN + "] " +
 						ChatColor.AQUA + "You Received " +
 						ChatColor.DARK_AQUA + vote.getcVar() + " " +  
 						ChatColor.DARK_AQUA + item.getType().name() +
 						"!");
 			}
+			return;
 		}
+		
 		return;
 	}
 
