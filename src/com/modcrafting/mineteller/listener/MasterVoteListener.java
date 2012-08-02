@@ -4,6 +4,9 @@
  */
 package com.modcrafting.mineteller.listener;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,11 +53,21 @@ public class MasterVoteListener implements VoteListener {
 		String cVar = vote.getcVar();
 		
 		if (username == null) return;
+		Player name = Bukkit.getServer().getPlayer(username);
 		
+		if(name == null){
+			name = Bukkit.getServer().getOfflinePlayer(username).getPlayer();
+			if(name != null){
+				MineTeller.getInstance().cache.put(name.getName().toLowerCase(), vote.getcVar() + " " + vote.getitemCode());
+				return;
+			}else{
+				MineTeller.getInstance().cache.put(username.toLowerCase(), vote.getcVar() + " " + vote.getitemCode());
+				return;				
+			}
+		}
 		//Examples of cVars to use on the site Timed Flying (itemCode=Amount of time)
 		//Kind of incompatible with NoCheat
 		if (cVar.equalsIgnoreCase("fly") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
-			Player name = Bukkit.getServer().getPlayer(username);
 			name.setFlying(true);
 			name.sendMessage(
 					ChatColor.GREEN + "[" + 
@@ -129,7 +142,6 @@ public class MasterVoteListener implements VoteListener {
 		//This will give cVar="xp" based on the value given for itemCode added to the original players amount
 		if (cVar.equalsIgnoreCase("xp")){
 			if(Bukkit.getServer().getOfflinePlayer(username).isOnline()){
-			Player name = Bukkit.getServer().getPlayer(username);
 			name.giveExp(Integer.parseInt(vote.getitemCode()));
 			name.sendMessage(
 					ChatColor.GREEN + "[" + 
@@ -138,13 +150,12 @@ public class MasterVoteListener implements VoteListener {
 					ChatColor.DARK_PURPLE + "You've Received " + vote.getitemCode() + " Xp");
 			return;
 			}else{
-				return;
+			return;
 			}
 		}
 		
 		//This will remove cVar="xp" based on the value given for itemCode added to the original players amount
 		if (cVar.equalsIgnoreCase("losexp") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
-			Player name = Bukkit.getServer().getPlayer(username);
 			if(name.getExp() > Float.parseFloat(vote.getitemCode())){
 				name.setExp(name.getExp() - Float.parseFloat(vote.getitemCode()));
 				name.sendMessage(
@@ -204,9 +215,11 @@ public class MasterVoteListener implements VoteListener {
 				}
 			}
 		}
+		if(cVar.equalsIgnoreCase("debug")){
+			this.outputHashMap(v.cache);
+		}
 		//This will kill the player on receipt if cVar="die"
 		if (cVar.equalsIgnoreCase("die") && Bukkit.getServer().getOfflinePlayer(username).isOnline()){
-			Player name = Bukkit.getServer().getPlayer(username);
 			name.setHealth(0);
 			name.sendMessage(
 					ChatColor.GREEN + "[" + 
@@ -223,7 +236,6 @@ public class MasterVoteListener implements VoteListener {
 		 * Displays You Recieved {QTY} {ITEMNAME}!
 		 */
 		if (Integer.parseInt(vote.getitemCode()) > 0){
-			Player name = Bukkit.getServer().getPlayer(username);
 			if(name != null && name.isOnline()){
 				ItemStack item = new ItemStack(
 						Integer.parseInt(vote.getitemCode()), 
@@ -242,6 +254,24 @@ public class MasterVoteListener implements VoteListener {
 		}
 		
 		return;
+	}
+
+	void outputHashMap(HashMap<String, String> hm){
+		if (hm == null)
+		{
+			return;
+		}
+		
+	    Collection<String> cValue = hm.values();
+	    Collection<String> cKey = hm.keySet();
+	    Iterator<String> itrValue = cValue.iterator();
+	    Iterator<String> itrKey = cKey.iterator();
+		
+		while (itrValue.hasNext() && itrKey.hasNext())
+		{
+			v.getServer().broadcastMessage(itrKey.next() + ": " + itrValue.next());
+				
+		}
 	}
 
 }

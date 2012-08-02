@@ -1,5 +1,5 @@
 name: MineTeller
 main: com.modcrafting.mineteller.MineTeller
-version: 0.4
+version: 0.5
 description: A plugin that gets notified when votes are made from MinecraftCasino.
 authors: [Built From Votifier -Deathmarine]

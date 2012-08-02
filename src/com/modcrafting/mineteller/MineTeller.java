@@ -24,12 +24,15 @@ package com.modcrafting.mineteller;
 import java.io.File;
 import java.security.KeyPair;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.modcrafting.mineteller.crypto.RSAIO;
@@ -66,9 +69,15 @@ public class MineTeller extends JavaPlugin {
 	/** The RSA key pair. */
 	private KeyPair keyPair;
 
+	public HashMap<String, String> cache = new HashMap<String, String>();
+
+	public final Listener player = new PlayerListener(this);
+	
 	@Override
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(player, this);
 		try {
 			MineTeller.instance = this;
 
