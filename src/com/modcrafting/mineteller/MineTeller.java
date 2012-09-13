@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.Listener;
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.modcrafting.mineteller.crypto.RSAIO;
@@ -49,13 +49,10 @@ import com.modcrafting.mineteller.net.VoteReceiver;
  */
 public class MineTeller extends JavaPlugin {
 
-	//Create a setter to pull from 
-	//PluginDescriptionFile pdfFile = this.getDescription();
-	
-	public static final String VERSION = "0.1";
+	// Create a setter to pull from
+	// PluginDescriptionFile pdfFile = this.getDescription();
 
-	/** The logger instance. */
-	private static final Logger log = Logger.getLogger("Votifier");
+	public static final String VERSION = "0.1";
 
 	/** The Votifier instance. */
 	private static MineTeller instance;
@@ -69,66 +66,69 @@ public class MineTeller extends JavaPlugin {
 	/** The RSA key pair. */
 	private KeyPair keyPair;
 
+	/** Economy instance. */
+	public Economy econ = null;
+
 	public HashMap<String, String> cache = new HashMap<String, String>();
 
-	public final Listener player = new PlayerListener(this);
-	
+	public final PlayerListener player = new PlayerListener(this);
+
+	public boolean econEnabled = false;
+
 	@Override
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(player, this);
+
+		File rsaDirectory = new File(getDataFolder() + "/rsa");
+		File listenerDirectory = new File(getDataFolder(), "/listeners");
+
+		// Check Directories
+		if (!getDataFolder().exists())
+			getDataFolder().mkdir();
+
+		if (!rsaDirectory.exists())
+			rsaDirectory.mkdir();
+
+		if (!listenerDirectory.exists())
+			listenerDirectory.mkdir();
+
+		// Generate/load config
+		this.getConfig().addDefault("host", "0.0.0.0");
+		this.getConfig().addDefault("port", 8992);
+		this.getConfig().addDefault("listener_folder",
+				getDataFolder().getPath() + "/listeners");
+		this.getConfig().options().copyDefaults(true);
+		this.saveConfig();
+
 		try {
-			MineTeller.instance = this;
-
-			// Handle configuration.
-			if (!getDataFolder().exists()) {
-				getDataFolder().mkdir();
-			}
-			File config = new File(getDataFolder() + "/config.yml");
-			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(config);
-			File rsaDirectory = new File(getDataFolder() + "/rsa");
-			String listenerDirectory = getDataFolder() + "/listeners";
-			if (!config.exists()) {
-				// First time run - do some initialization.
-				log.info("[" + pdfFile.getName() + "] Contemplating the universe...");
-
-				// Initialize the configuration file.
-				config.createNewFile();
-				cfg.set("host", "0.0.0.0");
-				cfg.set("port", 8992);
-				cfg.set("listener_folder", listenerDirectory);
-				cfg.save(config);
-
-				// Generate the RSA key pair.
-				rsaDirectory.mkdir();
-				new File(listenerDirectory).mkdir();
-				keyPair = RSAKeygen.generate(2048);
-				RSAIO.save(rsaDirectory, keyPair);
-			} else {
-				// Load configuration.
-				keyPair = RSAIO.load(rsaDirectory);
-				cfg = YamlConfiguration.loadConfiguration(config);
-			}
-
-			// Load the vote listeners.
-			listenerDirectory = cfg.getString("listener_folder");
-			listeners.addAll(ListenerLoader.load(listenerDirectory));
-
-			// Initialize the receiver.
-			String host = cfg.getString("host", "0.0.0.0");
-			int port = cfg.getInt("port", 8992);
-			voteReceiver = new VoteReceiver(host, port);
-			voteReceiver.start();
-			/* Configure for
-			 * getServer().getScheduler().scheduleAsyncRepeatingTask(this, voteReceiver, 20L, 20L);
-			 * Let bukkit recirculate the Thread
-			 */
-
-			log.info("[" + pdfFile.getName() + "] " + pdfFile.getVersion() + " enabled.");
+			// Generate the RSA key pair.
+			keyPair = RSAKeygen.generate(2048);
+			RSAIO.save(rsaDirectory, keyPair);
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Unable to enable [" + pdfFile.getName() + "]", ex);
+			logger(Level.SEVERE, "RSAKeygen", ex);
 		}
+
+		// Load the vote listeners.
+		try {
+			listeners.addAll(ListenerLoader.load(getConfig().getString(
+					"listener_folder")));
+		} catch (Exception ex) {
+
+		}
+
+		// Initialize the receiver.
+		voteReceiver = new VoteReceiver(getConfig().getString("host"),
+				getConfig().getInt("port"));
+		voteReceiver.start();
+		/*
+		 * Configure for
+		 * getServer().getScheduler().scheduleAsyncRepeatingTask(this,
+		 * voteReceiver, 20L, 20L); Let bukkit recirculate the Thread
+		 */
+
+		logger(Level.INFO, pdfFile.getVersion() + " enabled.");
 	}
 
 	@Override
@@ -136,8 +136,27 @@ public class MineTeller extends JavaPlugin {
 		// Interrupt the vote receiver.
 		if (voteReceiver != null) {
 			voteReceiver.shutdown();
-		}		
-		log.info("[MineTeller] disabled.");
+		}
+		logger(Level.INFO, "disabled.");
+	}
+
+	public void loadVault() {
+		if (getServer().getPluginManager().getPlugin("Vault") != null) {
+			try {
+				RegisteredServiceProvider<Economy> economyProvider = getServer()
+						.getServicesManager().getRegistration(
+								net.milkbowl.vault.economy.Economy.class);
+				econ = economyProvider.getProvider();
+				econEnabled = true;
+			} catch (Exception e) {
+				logger(Level.SEVERE,
+						"Error hooking to Vault! MineTeller Listener will not work!",
+						e);
+			}
+		} else {
+			logger(Level.SEVERE,
+					"Could not find Vault! Vote Listener will not work!");
+		}
 	}
 
 	/**
@@ -176,4 +195,20 @@ public class MineTeller extends JavaPlugin {
 		return keyPair;
 	}
 
+	public void logger(Level l, String message) {
+		this.getLogger().log(l, message);
+	}
+
+	public void logger(Level l, String cause, String message) {
+		this.getLogger().log(l, "(" + cause + ") " + message);
+	}
+
+	public void logger(Level l, String message, Exception ex) {
+		this.getLogger().log(l, message + " " + ex.getMessage());
+	}
+
+	public void logger(Level l, String cause, String message, Exception ex) {
+		this.getLogger().log(l,
+				"(" + cause + ") " + message + " " + ex.getMessage());
+	}
 }
