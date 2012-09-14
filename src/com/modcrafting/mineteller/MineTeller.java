@@ -48,11 +48,8 @@ import com.modcrafting.mineteller.net.VoteReceiver;
  * @author Kramer Campbell
  */
 public class MineTeller extends JavaPlugin {
-
-	// Create a setter to pull from
-	// PluginDescriptionFile pdfFile = this.getDescription();
-
-	public static final String VERSION = "0.1";
+	/** Set version for VoteReceiver */
+	public static String VERSION = "0.1";
 
 	/** The Votifier instance. */
 	private static MineTeller instance;
@@ -78,6 +75,7 @@ public class MineTeller extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
+		VERSION = pdfFile.getVersion();
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(player, this);
 
